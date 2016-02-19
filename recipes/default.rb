@@ -10,7 +10,6 @@ package 'vim'
 package 'tightvncserver'
 package 'gnuplot-x11'
 package 'curl'
-package 'samba'
 
 # Setup Git
 template "#{node['homedir']}/.gitconfig" do
@@ -41,26 +40,32 @@ node['repos'].each_pair do |name, url|
 end
 
 # Setup Samba for simple sharing
-template '/etc/samba/smb.conf' do
-  source 'samba.erb'
-  owner node['user']
-  group node['group']
-  mode '0644'
-  variables({
-     'smbuser' => node['samba-user']
-  })
-  notifies :reload, 'service[samba]', :immediately
-end
+if node['enable-samba'] == true
+  package 'samba'
 
-samba_user node['samba-user'] do
-  password node['samba-passwd']
-  action [:create, :enable]
-end
+  template '/etc/samba/smb.conf' do
+    source 'samba.erb'
+    owner node['user']
+    group node['group']
+    mode '0644'
+    variables({
+       'smbuser' => node['samba-user']
+    })
+    notifies :reload, 'service[samba]', :immediately
+  end
 
-service 'samba' do
-#  pattern 'smbd'
-  action [:enable, :start]
+  samba_user node['samba-user'] do
+    password node['samba-passwd']
+    action [:create, :enable]
+  end
+
+  service 'samba' do
+  #  pattern 'smbd'
+    action [:enable, :start]
+  end
 end
 
 # include the recipe
-include_recipe 'ntp'
+if node['enable-ntp'] == true
+  include_recipe 'ntp'
+end
