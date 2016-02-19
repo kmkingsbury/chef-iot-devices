@@ -12,26 +12,26 @@ package 'gnuplot-x11'
 package 'curl'
 
 # Setup Git
-template "#{node['homedir']}/.gitconfig" do
+template "#{node['iot-device']['homedir']}/.gitconfig" do
   source 'gitconfig.erb'
-  owner node['user']
-  group node['group']
+  owner node['iot-device']['user']
+  group node['iot-device']['group']
   mode '0644'
   variables({
-     'gitname' => node['git-name'],
-     'gitemail' => node['git-email']
+     'gitname' => node['iot-device']['git-name'],
+     'gitemail' => node['iot-device']['git-email']
   })
 end
 
 directory '/code' do
-  owner node['user']
-  group node['group']
+  owner node['iot-device']['user']
+  group node['iot-device']['group']
   mode '0755'
   action :create
 end
 
 # Get our Git Repos
-node['repos'].each_pair do |name, url|
+node['iot-device']['repos'].each_pair do |name, url|
   git "/code/#{name}" do
     repository url
     revision 'master'
@@ -40,22 +40,22 @@ node['repos'].each_pair do |name, url|
 end
 
 # Setup Samba for simple sharing
-if node['enable-samba'] == true
+if node['iot-device']['enable-samba'] == true
   package 'samba'
 
   template '/etc/samba/smb.conf' do
     source 'samba.erb'
-    owner node['user']
-    group node['group']
+    owner node['iot-device']['user']
+    group node['iot-device']['group']
     mode '0644'
     variables({
-       'smbuser' => node['samba-user']
+       'smbuser' => node['iot-device']['samba-user']
     })
     notifies :reload, 'service[samba]', :immediately
   end
 
-  samba_user node['samba-user'] do
-    password node['samba-passwd']
+  samba_user node['iot-device']['samba-user'] do
+    password node['iot-device']['samba-passwd']
     action [:create, :enable]
   end
 
@@ -66,6 +66,6 @@ if node['enable-samba'] == true
 end
 
 # include the recipe
-if node['enable-ntp'] == true
+if node['iot-device']['enable-ntp'] == true
   include_recipe 'ntp'
 end

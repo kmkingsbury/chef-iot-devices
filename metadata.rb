@@ -4,7 +4,7 @@ maintainer_email '@kmkingsbury'
 license 'Apache 2.0'
 description 'Installs/Configures iot-devices'
 long_description 'Installs/Configures iot-devices'
-version '0.3.2'
+version '0.3.3'
 
 depends 'samba', '~> 0.12.0'
 depends 'ntp', '~> 1.8.6'
