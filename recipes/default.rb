@@ -10,6 +10,7 @@ package 'vim'
 package 'tightvncserver'
 package 'gnuplot-x11'
 package 'curl'
+package 'usbmount'
 
 # Setup Git
 template "#{node['iot-device']['homedir']}/.gitconfig" do
